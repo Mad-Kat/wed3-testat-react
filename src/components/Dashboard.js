@@ -2,7 +2,7 @@
 
 import React from 'react'
 import TransactionTable from "./TransactionTable"
-import {getAccountDetails, getAccount} from "../api"
+import {getAccountDetails, getAccount, transfer} from "../api"
 import {Form, Segment, Divider, Grid, Button} from 'semantic-ui-react'
 import {Link} from 'react-router-dom'
 
@@ -23,29 +23,27 @@ class Dashboard extends React.Component {
 
     constructor() {
         super();
-        this.state = {accNumber: undefined, targetNr: undefined};
+        this.state = {accNumber: undefined, targetNr: undefined, amount: undefined, money: undefined};
     }
 
     render() {
         return (
             <div>
                 <Segment>
-                    <h1>Kontoübersicht {this.state.accNumber}</h1>
+                    <h1>Kontoübersicht {this.state.accNumber}{"   " + this.state.money}</h1>
                     <Divider/>
                     <Grid columns={2}>
                         <Grid.Row>
                             <Grid.Column>
                                 <h3>Neue Zahlung</h3>
-                                <Form>
+                                <Form onSubmit={this.handleSubmit.bind(this)}>
                                     <Form.Field>
                                         <label>Von</label>
                                         <Form.Select
                                             options={[{text: this.state.accNumber, value: this.state.accNumber}]}>
                                         </Form.Select>
                                     </Form.Field>
-
-
-                                        <Form.Field>
+                                    <Form.Field>
                                         <label>Nach</label>
                                         {this.state.validTarget ?
                                             <Form.Input placeholder="Zielkontonummer"
@@ -54,11 +52,11 @@ class Dashboard extends React.Component {
                                             <Form.Input error placeholder="Zielkontonummer"
                                                         onChange={this.verifyAccountNr.bind(this)}/>
                                         }
-                                        </Form.Field>
+                                    </Form.Field>
 
                                     <Form.Field>
                                         <label>Betrag</label>
-                                        <Form.Input type="number" placeholder="Betrag"/>
+                                        <Form.Input type="number" placeholder="Betrag" onChange={(event) => this.setState({amount:event.target.value})}/>
                                     </Form.Field>
                                     <Form.Button fluid primary type="submit">Betrag überweisen</Form.Button>
                                 </Form>
@@ -75,9 +73,7 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        getAccountDetails(this.props.token).then(({accountNr: details}) =>
-            this.setState({accNumber: details})
-        );
+        this.getDetails();
     }
 
     verifyAccountNr(event) {
@@ -85,6 +81,17 @@ class Dashboard extends React.Component {
             this.setState({targetNr: details, validTarget: true})).catch((e) => {
             this.setState({validTarget: false})
         });
+    }
+
+    handleSubmit(event){
+        event.preventDefault();
+        transfer(this.state.targetNr,this.state.amount,this.props.token).then(()=>this.getDetails());
+    }
+
+    getDetails(){
+        getAccountDetails(this.props.token).then(({accountNr: details, amount: money}) =>
+            this.setState({accNumber: details, money: money})
+        );
     }
 }
 
