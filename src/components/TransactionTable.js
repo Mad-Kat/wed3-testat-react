@@ -4,6 +4,7 @@
 import React from "react"
 import {getTransactions} from '../api'
 import {Table, Menu, Button} from 'semantic-ui-react'
+import Money from "./Money";
 
 export type Props = {
     token: string,
@@ -109,8 +110,8 @@ function TransactionList({transactions}) {
             <Table.Cell>{date}</Table.Cell>
             <Table.Cell>{from}</Table.Cell>
             <Table.Cell>{target}</Table.Cell>
-            <Table.Cell>{amount}</Table.Cell>
-            <Table.Cell>{total}</Table.Cell>
+            <Table.Cell><Money amount={amount} /></Table.Cell>
+            <Table.Cell><Money amount={total} /></Table.Cell>
         </Table.Row>;
     return <Table.Body>{transactions.map(renderTransaction)}</Table.Body>
 }
