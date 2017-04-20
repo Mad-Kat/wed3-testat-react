@@ -3,8 +3,7 @@
  */
 import React from "react"
 import {getTransactions} from '../api'
-import {Table, Menu, Button} from 'semantic-ui-react'
-import Money from "./Money";
+import {Table, Menu} from 'semantic-ui-react'
 
 export type Props = {
     token: string,
@@ -24,8 +23,7 @@ class TransactionTable extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.year !== nextProps.year || this.props.month !== nextProps.month) {
-            this.setState({month: nextProps.month, year: nextProps.year}, function () {
-                //this.transact.bind(this);
+            this.setState(state => ({month: nextProps.month, year: nextProps.year}), function () {
                 this.transact();
             });
         }
@@ -46,14 +44,16 @@ class TransactionTable extends React.Component {
                             <Table.HeaderCell>Betrag</Table.HeaderCell>
                             <Table.HeaderCell>Saldo</Table.HeaderCell>
                         </Table.Header>
-                        <TransactionList transactions={this.state.transactions}/>
+                        <Table.Body>
+                            {this.TransactionList(this.state.transactions)}
+                        </Table.Body>
                         <Table.Footer>
                             <Table.Row>
                                 <Table.HeaderCell colSpan="5">
                                     <Menu floated="right">
-                                        <Menu.Item onClick={this.previous.bind(this)}>&lt;</Menu.Item>
+                                        <Menu.Item onClick={this.previous}>&lt;</Menu.Item>
                                         <Menu.Item>{this.state.page}</Menu.Item>
-                                        <Menu.Item onClick={this.next.bind(this)}>&gt;</Menu.Item>
+                                        <Menu.Item onClick={this.next}>&gt;</Menu.Item>
                                     </Menu>
                                 </Table.HeaderCell>
                             </Table.Row>
@@ -64,8 +64,8 @@ class TransactionTable extends React.Component {
         )
     }
 
-    transact() {
-        var count = 3;
+    transact = () => {
+        let count = 3;
         if (this.props.size === "big") {
             count = 10;
         }
@@ -73,47 +73,55 @@ class TransactionTable extends React.Component {
             getTransactions(this.props.token, new Date(this.state.year, this.state.month - 1, 0, 0, 0, 0, 0).toISOString(),
                 new Date(this.state.year, this.state.month, 0, 0, 0, 0, 0).toISOString(), count, this.state.page * count)
                 .then(({result: transactions}) =>
-                    this.setState({transactions: transactions})
+                    this.setState(state => ({transactions: transactions}))
                 )
         } else {
             getTransactions(this.props.token, "", "", count, this.state.page * count)
                 .then(({result: transactions}) =>
-                    this.setState({transactions: transactions})
+                    this.setState(state => ({transactions: transactions}))
                 )
         }
-
-
-    }
+    };
 
     componentDidMount() {
         this.transact();
     }
 
-    next(event) {
+    next = () => {
         this.setState(state => ({page: this.state.page + 1}), function () {
             this.transact();
         });
-    }
+    };
 
-    previous(event) {
+    previous = () => {
         if (this.state.page !== 0) {
             this.setState(state => ({page: this.state.page - 1}), function () {
                 this.transact();
             });
         }
-    }
-}
+    };
 
-function TransactionList({transactions}) {
-    const renderTransaction = ({date, amount, from, target, total}) =>
-        <Table.Row className="transaction" key={date}>
-            <Table.Cell>{date}</Table.Cell>
-            <Table.Cell>{from}</Table.Cell>
-            <Table.Cell>{target}</Table.Cell>
-            <Table.Cell><Money amount={amount} /></Table.Cell>
-            <Table.Cell><Money amount={total} /></Table.Cell>
-        </Table.Row>;
-    return <Table.Body>{transactions.map(renderTransaction)}</Table.Body>
+    TransactionList = (transactions) => {
+        const renderTransaction = ({date, amount, from, target, total}) =>
+            <Table.Row className="transaction" key={date}>
+                <Table.Cell>{this.renderDate(date)}</Table.Cell>
+                <Table.Cell>{from}</Table.Cell>
+                <Table.Cell>{target}</Table.Cell>
+                <Table.Cell>{this.moneyString(amount)}</Table.Cell>
+                <Table.Cell>{this.moneyString(total)}</Table.Cell>
+            </Table.Row>;
+        return transactions.map(renderTransaction)
+    };
+
+    renderDate = (date) => {
+        let d = new Date(date);
+        return d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear();
+
+    };
+
+    moneyString = (amount) => {
+        return typeof(amount) === "undefined" ? "0CHF" : amount.toFixed(2) + "CHF";
+    };
 }
 
 export default TransactionTable

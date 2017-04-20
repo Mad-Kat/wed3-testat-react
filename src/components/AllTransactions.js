@@ -40,11 +40,11 @@ class AllTransactions extends React.Component {
                 <h1>Alle Transaktionen des Accounts {this.props.user.accountNr}</h1>
                 <Grid>
                     <Grid.Row>
-                        <Dropdown placeholder="Choose Year"  selection options={Years}
-                                  onChange={this.changeYear.bind(this)}/>
-                        <Dropdown placeholder="Choose Month"  selection options={Months}
+                        <Dropdown placeholder="Choose Year"  selection options={Years} value={this.state.year}
+                                  onChange={this.changeYear}/>
+                        <Dropdown placeholder="Choose Month"  selection options={Months} value={this.state.month}
                                   onChange={this.changeMonth.bind(this)}/>
-                        <Button onClick={this.reset.bind(this)}>X</Button>
+                        <Button onClick={this.reset}>X</Button>
                     </Grid.Row>
 
                 </Grid>
@@ -54,16 +54,16 @@ class AllTransactions extends React.Component {
         )
     }
 
-    changeYear({}, data) {
-        this.setState({year: data.value});
-    }
+    changeYear = (_, data) => {
+        this.setState(state => ({year: data.value}));
+    };
 
-    changeMonth({}, data) {
-        this.setState({month: data.value});
-    }
+    changeMonth = (_, data) => {
+        this.setState(state => ({month: data.value}));
+    };
 
-    reset() {
-        this.setState({year: undefined, month: undefined});
+    reset = () => {
+        this.setState(state => ({year: undefined, month: undefined}));
     }
 
 }

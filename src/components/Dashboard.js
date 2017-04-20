@@ -5,17 +5,11 @@ import TransactionTable from "./TransactionTable"
 import {getAccountDetails, getAccount, transfer} from "../api"
 import {Form, Segment, Divider, Grid, Button} from 'semantic-ui-react'
 import {Link} from 'react-router-dom'
-import Money from './Money'
 
 
 export type Props = {
     token: string,
 }
-
-const options = [
-    {key: 'm', text: 'Male', value: 'male'},
-    {key: 'f', text: 'Female', value: 'female'},
-]
 
 
 class Dashboard extends React.Component {
@@ -31,7 +25,7 @@ class Dashboard extends React.Component {
         return (
             <div>
                 <Segment>
-                    <h1>Kontoübersicht {this.state.accNumber}<Money amount={this.state.money}/></h1>
+                    <h1>Kontoübersicht {this.state.accNumber}</h1>
                     <Divider/>
                     <Grid columns={2}>
                         <Grid.Row>
@@ -41,7 +35,7 @@ class Dashboard extends React.Component {
                                     <Form.Field>
                                         <label>Von</label>
                                         <Form.Select
-                                            options={[{text: this.state.accNumber, value: this.state.accNumber}]}>
+                                            options={[{text: this.state.accNumber + "(" + this.StringMoney(this.state.money)+ ")", value: this.state.accNumber}]}>
                                         </Form.Select>
                                     </Form.Field>
                                     <Form.Field>
@@ -58,10 +52,10 @@ class Dashboard extends React.Component {
                                     <Form.Field>
                                         <label>Betrag</label>
                                         {this.state.valid ?
-                                            <Form.Input type="number" step="0.05" placeholder="Betrag"
+                                            <Form.Input type="number" step="0.01" placeholder="Betrag"
                                                         onChange={this.verifyMoney.bind(this)}/>
                                             :
-                                            <Form.Input error type="number" step="0.05" placeholder="Betrag"
+                                            <Form.Input error type="number" step="0.01" placeholder="Betrag"
                                                         onChange={this.verifyMoney.bind(this)}/>
                                         }
 
@@ -105,14 +99,17 @@ class Dashboard extends React.Component {
     }
 
     verifyMoney(event){
-        console.log(parseFloat(event.target.value).toPrecision(2)%0.05.toPrecision(2))
-        if(event.target.value > 0.05 && (event.target.value%0.05==0)){
+        if(event.target.value > 0.05){
             this.setState({amount:event.target.value,valid:true});
         }else{
             this.setState({valid: false});
         }
 
     }
+
+    StringMoney = function(amount){
+        return typeof(amount) === "undefined" ? "0CHF" : amount.toFixed(2)+"CHF";
+    };
 }
 
 export default Dashboard
