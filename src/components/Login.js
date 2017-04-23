@@ -90,7 +90,7 @@ class Login extends React.Component {
                                 <Button primary fluid onClick={this.handleSubmit}>Log-in</Button>
                             </Segment>
                         </Form>
-                        { error && <Message error>Es ist ein Fehler aufgetreten!</Message> }
+                        { error && <Message error>Login fehlgeschlagen</Message> }
 
                         <Message>
                             <Link to="/signup">Noch keinen Account?</Link>
