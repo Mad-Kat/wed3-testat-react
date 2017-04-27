@@ -1,9 +1,9 @@
 /**
  * Created by Luca on 06.04.2017.
  */
-import React from "react"
-import {getTransactions} from '../api'
-import {Table, Menu} from 'semantic-ui-react'
+import React from "react";
+import {getTransactions} from "../api";
+import {Menu, Table} from "semantic-ui-react";
 
 export type Props = {
     token: string,
@@ -18,12 +18,19 @@ class TransactionTable extends React.Component {
 
     constructor() {
         super();
-        this.state = {transactions: [], page: 0};
+        this.state = {transactions: [], page: 0, maxPages: 0};
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.year !== nextProps.year || this.props.month !== nextProps.month) {
-            this.setState(state => ({month: nextProps.month, year: nextProps.year}), function () {
+        if ((this.props.year !== nextProps.year || this.props.month !== nextProps.month) && (
+            nextProps.year !== undefined && nextProps.month !== undefined)) {
+            this.setState(state => ({month: nextProps.month, year: nextProps.year, page: 0}), function () {
+                this.transact();
+            });
+        }
+        if ((this.props.year !== undefined && this.props.month !== undefined) &&
+            (nextProps.year === undefined && nextProps.month === undefined)) {
+            this.setState(state => ({month: undefined, year: undefined, page: 0}), function () {
                 this.transact();
             });
         }
@@ -52,7 +59,7 @@ class TransactionTable extends React.Component {
                                 <Table.HeaderCell colSpan="5">
                                     <Menu floated="right">
                                         <Menu.Item onClick={this.previous}>&lt;</Menu.Item>
-                                        <Menu.Item>{this.state.page}</Menu.Item>
+                                        <Menu.Item>{this.state.page}/{this.state.maxPages}</Menu.Item>
                                         <Menu.Item onClick={this.next}>&gt;</Menu.Item>
                                     </Menu>
                                 </Table.HeaderCell>
@@ -72,25 +79,30 @@ class TransactionTable extends React.Component {
         if (typeof(this.state.month) !== "undefined" && typeof(this.state.year) !== "undefined") {
             getTransactions(this.props.token, new Date(this.state.year, this.state.month - 1, 0, 0, 0, 0, 0).toISOString(),
                 new Date(this.state.year, this.state.month, 0, 0, 0, 0, 0).toISOString(), count, this.state.page * count)
-                .then(({result: transactions}) =>
-                    this.setState(state => ({transactions: transactions}))
-                )
+                .then(({result: transactions, query: q}) => {
+                    let maxPages = Math.floor(q.resultcount / count);
+                    this.setState(state => ({transactions: transactions, maxPages: maxPages}))
+                })
         } else {
             getTransactions(this.props.token, "", "", count, this.state.page * count)
-                .then(({result: transactions}) =>
-                    this.setState(state => ({transactions: transactions}))
-                )
+                .then(({result: transactions, query: q}) => {
+                    let maxPages = Math.floor(q.resultcount / count);
+                    this.setState(state => ({transactions: transactions, maxPages: maxPages}));
+                })
         }
     };
 
     componentDidMount() {
+        this.setState(state => ({page: 0, maxPages: 0}));
         this.transact();
     }
 
     next = () => {
-        this.setState(state => ({page: this.state.page + 1}), function () {
-            this.transact();
-        });
+        if (this.state.page < this.state.maxPages) {
+            this.setState(state => ({page: this.state.page + 1}), function () {
+                this.transact();
+            });
+        }
     };
 
     previous = () => {

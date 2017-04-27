@@ -54,7 +54,6 @@ class Signup extends React.Component {
         event.preventDefault()
         const {login, firstname, lastname, password} = this.state
         signup(login, firstname, lastname, password).then(result => {
-            console.log("Signup result ", result)
             this.setState({redirectToReferrer: true, error: null})
         }).catch(error =>
             this.setState({error})
@@ -63,7 +62,6 @@ class Signup extends React.Component {
 
     render() {
         const {redirectToReferrer, error} = this.state
-
         if (redirectToReferrer) {
             return (
                 <Redirect to='/login'/>

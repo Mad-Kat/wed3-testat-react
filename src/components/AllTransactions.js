@@ -1,9 +1,9 @@
 // @flow
 
-import React from 'react'
-import TransactionTable from "./TransactionTable"
-import type {User} from '../api'
-import {Dropdown, Button, Grid} from 'semantic-ui-react'
+import React from "react";
+import TransactionTable from "./TransactionTable";
+import type {User} from "../api";
+import {Button, Dropdown, Grid} from "semantic-ui-react";
 
 export type Props = {
     token: string,
@@ -11,6 +11,7 @@ export type Props = {
 }
 
 const Years = [{text: "2015", value: "2015"}, {text: "2016", value: "2016"}, {text: "2017", value: "2017"}];
+
 const Months = [
     {text: "Januar", value: 1},
     {text: "Februar", value: 2},
@@ -40,9 +41,9 @@ class AllTransactions extends React.Component {
                 <h1>Alle Transaktionen des Accounts {this.props.user.accountNr}</h1>
                 <Grid>
                     <Grid.Row>
-                        <Dropdown placeholder="Choose Year"  selection options={Years} value={this.state.year}
+                        <Dropdown placeholder="Choose Year" selection options={Years} value={this.state.year}
                                   onChange={this.changeYear}/>
-                        <Dropdown placeholder="Choose Month"  selection options={Months} value={this.state.month}
+                        <Dropdown placeholder="Choose Month" selection options={Months} value={this.state.month}
                                   onChange={this.changeMonth.bind(this)}/>
                         <Button onClick={this.reset}>X</Button>
                     </Grid.Row>

@@ -1,10 +1,10 @@
 // @flow
 
-import React from 'react'
-import TransactionTable from "./TransactionTable"
-import {getAccountDetails, getAccount, transfer} from "../api"
-import {Form, Segment, Divider, Grid, Button} from 'semantic-ui-react'
-import {Link} from 'react-router-dom'
+import React from "react";
+import TransactionTable from "./TransactionTable";
+import {getAccount, getAccountDetails, transfer} from "../api";
+import {Button, Divider, Form, Grid, Segment} from "semantic-ui-react";
+import {Link} from "react-router-dom";
 
 
 export type Props = {
@@ -18,8 +18,10 @@ class Dashboard extends React.Component {
 
     constructor() {
         super();
-        this.state = {accNumber: undefined, targetNr: undefined, amount: undefined, money: undefined, valid: undefined,
-        success: false};
+        this.state = {
+            accNumber: undefined, targetNr: undefined, amount: undefined, money: undefined, valid: undefined,
+            success: false
+        };
     }
 
     render() {
@@ -36,7 +38,10 @@ class Dashboard extends React.Component {
                                     <Form.Field>
                                         <label>Von</label>
                                         <Form.Select
-                                            options={[{text: this.state.accNumber + this.moneyString(this.state.money), value: this.state.accNumber}]}>
+                                            options={[{
+                                                text: this.state.accNumber + this.moneyString(this.state.money),
+                                                value: this.state.accNumbers
+                                            }]}>
                                         </Form.Select>
                                     </Form.Field>
                                     <Form.Field>
@@ -91,11 +96,11 @@ class Dashboard extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        if(this.state.valid && this.state.validTarget) {
+        if (this.state.valid && this.state.validTarget) {
             transfer(this.state.targetNr, this.state.amount, this.props.token).then(() => {
                 this.getDetails();
-                this.setState({success:true})
-            } );
+                this.setState({success: true})
+            });
         }
     };
 
@@ -107,9 +112,9 @@ class Dashboard extends React.Component {
 
     verifyMoney = (event) => {
         this.setState({success: false});
-        if(event.target.value > 0.05){
-            this.setState({amount:event.target.value,valid:true});
-        }else{
+        if (event.target.value > 0.05) {
+            this.setState({amount: event.target.value, valid: true});
+        } else {
             this.setState({valid: false});
         }
 
